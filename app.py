@@ -8,8 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
-# CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", "https://your-app.vercel.app"]}})
+CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", "https://your-app.vercel.app"]}})
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 KNOWLEDGE_BASE=[]
 
