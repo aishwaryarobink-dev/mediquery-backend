@@ -15,7 +15,8 @@ CORS(app, resources={r"/*": {
         "https://mediquery-frontend.vercel.app"  # Your Vercel URL
     ],
     "methods": ["GET", "POST", "OPTIONS"],
-    "allow_headers": ["Content-Type", "Authorization"]
+    "allow_headers": ["Content-Type", "Authorization"],
+    "supports_credentials": True
 }})
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 KNOWLEDGE_BASE=[]
@@ -48,8 +49,11 @@ def get_context(query):
 def health():
     return {"status":"ok"}
 
-@app.route('/chat', methods=['POST'])
+@app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat():
+    if request.method == 'OPTIONS':
+        return '', 204
+    
     data = request.json
     msgs = data.get("messages",[])
     if not msgs:
@@ -85,5 +89,6 @@ def chat():
     return Response(stream_with_context(generate()),
                         mimetype='text/event-stream',
                         )
-if __name__ == '__main__':    
-    app.run()
+if __name__ == '__main__':
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
